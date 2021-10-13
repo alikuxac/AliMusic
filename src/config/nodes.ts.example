@@ -1,8 +1,8 @@
 export const nodes: nodesOptions[] = [
     {
-        host: "n17.danbot.host",
-        port: 1496,
-        password: "alikuxac"
+        host: "",
+        port: 0,
+        password: ""
     }
 ];
 
