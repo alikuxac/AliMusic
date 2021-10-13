@@ -1,0 +1,47 @@
+{
+  "name": "@aliuxac/music",
+  "version": "1.0.0",
+  "description": "Alikuxac Personal Music Discord Bot",
+  "main": "dist/index.js",
+  "imports": {
+    "#lib/*": "./dist/lib/*.js",
+    "#lib/structures/*": "./dist/lib/structures/*.js",
+    "#config": "./dist/config/*.js",
+    "#root/*": "./dist/*.js"
+  },
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "build": "tsc -b src",
+    "compile": "yarn clean && yarn build",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alikuxac/AliMusic.git"
+  },
+  "keywords": [
+    "discord",
+    "alikuxac"
+  ],
+  "author": "Alikuxac",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/alikuxac/AliMusic/issues"
+  },
+  "homepage": "https://github.com/alikuxac/AliMusic#readme",
+  "dependencies": {
+    "@sapphire/decorators": "^3.1.1",
+    "@sapphire/framework": "^2.0.0-next.888c7db3.0",
+    "@sapphire/pieces": "^3.0.1",
+    "colorette": "^2.0.16",
+    "discord.js": "^13.2.0",
+    "dotenv": "^10.0.0",
+    "erela.js": "^2.3.3",
+    "mongoose": "^6.0.10"
+  },
+  "devDependencies": {
+    "node-abort-controller": "^3.0.1",
+    "rimraf": "^3.0.2",
+    "undici": "^4.7.1"
+  }
+}
