@@ -157,13 +157,13 @@ export default class AliMusicClient extends SapphireClient {
     }
 
     public msToHHMMSS(duration: number): string {
-        let seconds: string | number = ((duration / 1000) % 60),
-            minutes: string | number = ((duration / (1000 * 60)) % 60),
-            hours: string | number = ((duration / (1000 * 60 * 60)) % 24);
+        let seconds: string | number = ((duration / 1000) % 60).toFixed(0),
+            minutes: string | number = ((duration / (1000 * 60)) % 60).toFixed(0),
+            hours: string | number = ((duration / (1000 * 60 * 60)) % 24).toFixed(0);
 
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
+        hours = +hours < 10 ? '0' + hours : hours;
+        minutes = +minutes < 10 ? '0' + minutes : minutes;
+        seconds = +seconds < 10 ? '0' + seconds : seconds;
 
         return hours + ':' + minutes + ':' + seconds;
     }
