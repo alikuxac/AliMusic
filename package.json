@@ -7,7 +7,10 @@
     "#lib/*": "./dist/lib/*.js",
     "#lib/structures/*": "./dist/lib/structures/*.js",
     "#config": "./dist/config/*.js",
-    "#root/*": "./dist/*.js"
+    "#root/*": "./dist/*.js",
+    "#models/*": "./dist/models/*.js",
+    "#utils/*": "./dist/utils/*.js",
+    "#decorators/*": "./dist/decorators/*.js"
   },
   "scripts": {
     "clean": "rimraf ./dist",
@@ -30,19 +33,26 @@
   },
   "homepage": "https://github.com/alikuxac/AliMusic#readme",
   "dependencies": {
-    "@sapphire/decorators": "^3.1.4",
-    "@sapphire/framework": "^2.1.4",
-    "@sapphire/pieces": "^3.1.1",
+    "@discordjs/opus": "^0.7.0",
+    "@discordjs/voice": "^0.8.0",
+    "@distube/spotify": "^1.1.0",
+    "@sapphire/decorators": "^4.0.2",
+    "@sapphire/discord-utilities": "^2.6.0",
+    "@sapphire/framework": "^2.3.0",
+    "@sapphire/pieces": "^3.2.0",
     "colorette": "^2.0.16",
-    "discord.js": "^13.3.1",
-    "dotenv": "^10.0.0",
-    "erela.js": "^2.3.3",
-    "mongoose": "^6.0.13"
+    "discord.js": "^13.6.0",
+    "distube": "^3.2.1",
+    "dotenv": "^14.3.2",
+    "libsodium-wrappers": "^0.7.9",
+    "mongoose": "^6.1.8",
+    "nanoid": "^3.2.0"
   },
   "devDependencies": {
+    "@types/node": "16",
     "node-abort-controller": "^3.0.1",
     "rimraf": "^3.0.2",
-    "typescript": "^4.5.2",
-    "undici": "^4.10.0"
+    "typescript": "^4.5.5",
+    "undici": "^4.12.2"
   }
 }
