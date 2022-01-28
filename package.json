@@ -15,7 +15,7 @@
   "scripts": {
     "clean": "rimraf ./dist",
     "build": "tsc -b src",
-    "compile": "yarn clean && yarn build",
+    "compile": "npm run clean && npm run build",
     "start": "node dist/index.js"
   },
   "repository": {
