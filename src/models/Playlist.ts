@@ -1,12 +1,12 @@
 import { Document, model, Schema } from 'mongoose';
-import type { Track } from 'erela.js';
+import type { Song } from 'distube';
 import { customAlphabet } from 'nanoid';
 const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 10);
 
 export interface IPlaylist extends Document {
     userID: string;
     name: string;
-    songs: Array<Track>;
+    songs: Array<Song>;
     createdAt: number;
     updatedAt: number;
 }
