@@ -1,16 +1,18 @@
 import 'dotenv/config';
+import { connect } from 'mongoose';
+
 import Client from '#lib/structures/AliMusicClient';
+import { MONGO } from '#root/configs';
 
 const client = new Client();
-// { path: './src/.env' }
-const main = async () => {
+(async () => {
     try {
-        await client.build();
+        await connect(MONGO, { dbName: 'AliMusic' });
+        console.log('Connected to MongoDB');
+        await client.start();
     } catch (err: any) {
         console.error(err);
         client.destroy();
-		process.exit(1);
+        process.exit(1);
     }
-}
-
-main();
+})();

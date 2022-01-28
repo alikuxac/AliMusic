@@ -2,6 +2,13 @@ import { ApplyOptions } from '@sapphire/decorators'
 import { Command, CommandOptions, Args } from '@sapphire/framework';
 import { Message, MessageEmbed } from 'discord.js';
 
+import {
+    RequiredUserInVoice,
+    RequireSameVoiceChannel,
+    RequiredBotInVoice,
+    PlayerExists
+} from '#decorators/Voice';
+import { getAudio } from '#utils/voice';
 @ApplyOptions<CommandOptions>({
     name: "queue",
     aliases: ['q'],
@@ -10,19 +17,24 @@ import { Message, MessageEmbed } from 'discord.js';
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class QueueCMD extends Command {
-    public async run(message: Message, args: Args) {
-        const player = this.container.manager.players.get(message.guild?.id as string);
-        if (!player) return message.reply('there is no player for this guild.');
+
+    @RequiredUserInVoice()
+    @RequiredBotInVoice()
+    @RequireSameVoiceChannel()
+    @PlayerExists()
+    public async messageRun(message: Message, args: Args) {
+
 
         const page = await args.pick('number').catch(() => 0);
+        const queue = getAudio(message.guild!);
 
         const QueueEmbed = new MessageEmbed()
-            .setAuthor(`Queue for ${message.guild?.name}  -  [ ${player.queue.length} Tracks ]`, message.guild?.iconURL({ dynamic: true }) as string);
+            .setAuthor({ name: `Queue for ${message.guild?.name}  -  [ ${queue.songs.length} Tracks ]`, iconURL: <string>message.guild?.iconURL({ dynamic: true }) });
         // get the right tracks of the current tracks
-        const tracks = player.queue;
+        const tracks = queue.songs;
         // if there are no other tracks, information
 
-        if (tracks.current) QueueEmbed.addField('Current', `**[${tracks.current.title}](${tracks.current.uri})**`);
+        if (queue.playing) QueueEmbed.addField('Current', `**[${tracks[0].name}](${tracks[0].url})**`);
 
         const multiple = 10;
         const end = page * multiple;
@@ -34,17 +46,13 @@ export class QueueCMD extends Command {
         }
         else {
             QueueEmbed.setDescription(arr
-                .map((track, i) => `${start + ++i} - [${track.title}](${track.uri})`)
+                .map((track, i) => `${start + ++i} - [${track.name}](${track.url})`)
                 .join('\n'));
         }
         const maxPages = Math.ceil(tracks.length / multiple);
 
-        QueueEmbed.setFooter(`Page ${page > maxPages ? maxPages : page} of ${maxPages}`);
+        QueueEmbed.setFooter({ text: `Page ${page > maxPages ? maxPages : page} of ${maxPages}` });
         QueueEmbed.setColor('RANDOM');
-        QueueEmbed.setAuthor(
-            ( message.member?.nickname ?? message.author.tag),
-            message.author.displayAvatarURL({ dynamic: true }),
-        );
         return message.channel.send({ embeds: [QueueEmbed] });
     }
 }

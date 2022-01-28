@@ -6,9 +6,12 @@
 		"rootDir": ".",
 		"baseUrl": ".",
 		"paths": {
+			"#decorators/*": ["decorators/*"],
 			"#lib/*": ["lib/*"],
 			"#lib/structures/*": ["lib/structures/*"],
-			"#root/*": ["*"]
+			"#models/*": ["models/*"],
+			"#root/*": ["*"],
+			"#utils/*": ["utils/*"]
 		},
 		"composite": true
 	},

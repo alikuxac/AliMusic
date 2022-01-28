@@ -1,155 +1,95 @@
 import { SapphireClient } from '@sapphire/framework';
 import { container } from '@sapphire/pieces'
 import { Enumerable } from '@sapphire/decorators';
-import { TextChannel, Guild, MessageEmbed, User } from 'discord.js';
-
+import { DisTube } from 'distube';
+import { SpotifyPlugin } from '@distube/spotify';
+// import {
+//     TextChannel,
+//     MessageEmbed
+// } from 'discord.js';
 
 import { CLIENT_OPTIONS, TOKEN } from '#root/configs';
-import { nodes } from '#root/config/nodes'
-import Player from '#lib/structures/Player'
 
 export default class AliMusicClient extends SapphireClient {
     @Enumerable(false)
-    public manager: Player;
+    public distube: DisTube;
 
     constructor() {
         super(CLIENT_OPTIONS);
 
-        this.manager = new Player({
-            nodes: nodes,
-            send: (id, payload) => {
-                const guild = this.guilds.cache.get(id);
-                if (guild) guild.shard.send(payload);
-            },
-            autoPlay: true,
-        }, this);
-        container.manager = this.manager;
+        this.distube = new DisTube(this, {
+            leaveOnStop: false,
+            leaveOnEmpty: false,
+            searchSongs: 10,
+            plugins: [new SpotifyPlugin()],
+        });
+        container.distube = this.distube;
+        this.loadDistubeEvent();
+
     }
 
-    public async build() {
+    public async start() {
         await this.login(TOKEN);
-        this.loadManagerEvent();
     }
 
-    public loadManagerEvent() {
-        this.on('ready', () => { this.manager.init(this.user?.id) });
-        this.on('raw', (d: any) => { this.manager.updateVoiceState(d) });
+    private loadDistubeEvent() {
+        this.distube.on('addList', (queue, playlist) => {
+            queue.textChannel?.send(`Added \`${playlist.name}\` playlist (${playlist.songs.length} songs) to the queue!`)
+        })
 
-        // Emitted whenever a node connects
-        this.manager.on('nodeConnect', node => {
-            console.log(`Node "${node.options.identifier}" connected.`);
+        this.distube.on("addSong", (queue, song) => {
+            queue.textChannel?.send(
+                `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}.`
+            )
         });
 
-        // Emitted whenever a node reconnects
-        this.manager.on('nodeReconnect', node => {
-            console.log(`Node "${node.options.identifier}" reconnecting.`);
+        this.distube.on('deleteQueue', (queue) => {
+            queue.textChannel?.send(`Deleted queue!`)
+        })
+
+        this.distube.on('disconnect', (queue) => {
+            queue.textChannel?.send(`Disconnected from the queue!`)
         });
 
-        // Emitted whenever a node disconnects
-        this.manager.on('nodeDisconnect', node => {
-            console.log(`Node "${node.options.identifier}" disconnected.`);
+        this.distube.on('error', (channel, error) => {
+            channel.send(`Error while playing: ${error}`)
+        })
+
+        this.distube.on('finish', queue => {
+            queue.textChannel?.send("No more song in queue")
         });
 
-        // Emitted whenever a node encountered an error
-        this.manager.on('nodeError', (node, error) => {
-            console.log(`Node "${node.options.identifier}" encountered an error: ${error.message}.`);
+        this.distube.on('initQueue', (queue) => {
+            queue.autoplay = false;
+            queue.volume = 100;
+        })
+
+        this.distube.on("noRelated", queue => {
+            queue.textChannel?.send("Can't find related video to play.")
         });
 
-        this.manager.on('playerCreate', async (player) => {
-            setTimeout(async () => {
-                player.setVolume(100);
-                player.set('autoplay', false);
-                player.set('24/7', false);
-            }, 100);
+        this.distube.on("playSong", (queue, song) => {
+            queue.textChannel?.send(
+                `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}`
+            )
         });
 
-        this.manager.on('playerMove', async (player, _oldChannel = '', newChannel = '') => {
-            if (!newChannel) {
-                const playchannel = this.channels.cache.get(player.textChannel as string) as TextChannel;
-                playchannel?.send('Queue has ended. I left the channel');
-                try {
-                    if (player.get('msgid')) {
-                        const oldChannel = this.channels.cache.get(player.textChannel as string) as TextChannel;
-                        const oldMessage = await oldChannel.messages.fetch(player.get('msgid'));
-                        setTimeout(async () => {
-                            await oldMessage.delete();
-                        }, 1500);
-                    }
-                }
-                catch (err) {
-                    console.error(err);
-                }
-                player.destroy();
-            }
-            else {
-                player.voiceChannel = newChannel;
-                if (player.paused) return;
-                setTimeout(() => {
-                    player.pause(true);
-                    setTimeout(() => player.pause(false), this.ws.ping * 2);
-                }, this.ws.ping * 2);
-            }
+        this.distube.on("searchCancel", (message) => {
+            message.channel.send(`Searching canceled`)
         });
 
-        this.manager.on('trackStart', async (player, track) => {
-            const requester = track.requester as User;
-
-            const guild = this.guilds.cache.get(player.guild) as Guild;
-            player.set('votes', 0);
-            for (const userid of guild.members.cache.map(member => member.user.id)) { player.set(`vote-${userid}`, false); }
-            player.set('previoustrack', track);
-            // Wait 500ms
-            await this.delay(500);
-
-            const channel = await guild.channels.fetch(player.textChannel as string) as TextChannel;
-            const embed = new MessageEmbed()
-                .setTitle('Music Player')
-                .setDescription(`Playing: ${track.title}`)
-                .setThumbnail(track.displayThumbnail("1"))
-                .setColor('#ff0000')
-                .addField('❯ Duration: ', `\`${track.isStream ? 'LIVE STREAM' : this.msToHHMMSS(track.duration)}\``, true)
-                .addField('❯ Song By: ', `\`${track.author}\``, true)
-                .addField('❯ Queue length: ', `\`${player.queue.length} Songs\``, true)
-                .setFooter(`Requested by: <@${requester?.id}>`, requester?.displayAvatarURL({ dynamic: true }));
-
-            // Send a message when not in manager music channel and the track starts playing with the track name
-            if (player.get('msgid')) {
-                const oldMsg = await channel.messages.fetch(player.get('msgid'));
-                await this.delay(500);
-                await oldMsg.delete().catch();
-            }
-            const sentMsg = await channel.send({ embeds: [embed] });
-            player.set('msgid', sentMsg.id);
-
+        this.distube.on("searchNoResult", (message, query) => { message.channel.send(`No result found for ${query}!`) });
+        this.distube.on("searchResult", (message, results) => {
+            message.channel.send(`**Choose an option from below**\n${
+                results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")
+            }\n*Enter anything else or wait 60 seconds to cancel*`);
         });
-
-        this.manager.on('trackError', (player, track) => {
-            player.stop();
-            (this.channels.cache.get(player.textChannel as string) as TextChannel)
-                .send(`I skipped the track **${track.title}** because of error`);
+        this.distube.on('searchInvalidAnswer', (message, answer, query) => {
+            message.channel.send(`Invalid answer: ${answer} for ${query}!`)
         });
-
-        // Emitted the player queue ends
-        this.manager.on('queueEnd', async (player) => {
-
-            const guild = this.guilds.cache.get(player.guild);
-            if (player.get('autoplay')) return this.manager.autoplay(player);
-            const noSongEmbed = new MessageEmbed()
-                .setTitle('Music Player!')
-                .setDescription('No playing song currently!\nJoin a voice channel and enter a song name or url to play.')
-                .setColor('#ff0000')
-                .setFooter('Requested by: None');
-
-            const channel = (guild as Guild).channels.cache.get(player.textChannel as string) as TextChannel;
-            if (player.get('msgid')) {
-                const oldMsg = await channel.messages.fetch(player.get('msgid'));
-                await this.delay(500);
-                await oldMsg.delete().catch();
-            }
-            channel.send({ embeds: [noSongEmbed] });
-
-        });
-
+        this.distube.on('searchDone', (message, query) => {
+            message.channel.send(`Search for ${query} done!`)
+        })
     }
 
     public delay(ms: number) {
@@ -171,12 +111,14 @@ export default class AliMusicClient extends SapphireClient {
 
 declare module '@sapphire/pieces' {
     interface Container {
-        manager: Player
+        // manager: Player;
+        distube: DisTube;
     }
 }
 
 declare module 'discord.js' {
     interface Client {
-        manager: Player
+        // manager: Player
+        distube: DisTube;
     }
 }
