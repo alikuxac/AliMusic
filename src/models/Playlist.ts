@@ -18,6 +18,8 @@ const playlistSchema = new Schema({
     songs: { type: Array, default: [] },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
+}, {
+    versionKey: false
 });
 
 export default model<IPlaylist>('Playlist', playlistSchema);

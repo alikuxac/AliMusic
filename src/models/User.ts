@@ -14,6 +14,8 @@ const userSchema = new Schema({
     whitelist: { type: Boolean, required: true, default: false },
     blacklist: { type: Boolean, required: true, default: false },
     playlist_limit: { type: Number, required: true, default: 5 },
+}, {
+    versionKey: false
 });
 
 export default model<IUser>("User", userSchema);

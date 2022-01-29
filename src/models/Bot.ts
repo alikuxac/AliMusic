@@ -8,6 +8,8 @@ interface IBot extends Document {
 const botSchema = new Schema({
     id: { type: String, required: true, unique: true },
     whitelist_server: { type: Array, default: [] },
+}, {
+    versionKey: false
 });
 
 export default model<IBot>('Bot', botSchema);

@@ -13,6 +13,8 @@ const guildSchema = new Schema({
     id: { type: String, required: true, unique: true },
     prefix: { type: String, default: PREFIX },
     whitelist: { type: Boolean, default: false },
-})
+}, {
+    versionKey: false
+});
 
 export default model<IGuild>('Guild', guildSchema)
