@@ -11,10 +11,11 @@ export const CLIENT_OPTIONS: ClientOptions = {
     defaultPrefix: PREFIX,
     regexPrefix: /^(hey\s+)?ali music[,! ]/i,
     intents: ['GUILD_MESSAGES', 'GUILD_MEMBERS', 'GUILD_VOICE_STATES', 'GUILDS', 'GUILD_MESSAGE_TYPING'],
-    partials: ['GUILD_MEMBER', 'CHANNEL', 'MESSAGE', 'USER'],
+    partials: ['GUILD_MEMBER', 'CHANNEL', 'MESSAGE', 'USER', 'REACTION'],
     fetchPrefix: async (message: Message) => {
-        if (!message.guild) return [PREFIX];
-        const guild = await GuildModels.findOne({ id: message.guild.id });
-        return [guild ? guild?.prefix : PREFIX];
+        let prefix = [PREFIX];
+        const user = await UserModels.findOne({ userID: message.author.id });
+        if (user) prefix = prefix.concat(user.prefix);
+        return prefix;
     }
 };
