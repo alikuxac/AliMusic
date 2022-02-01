@@ -21,6 +21,7 @@ export default class AliMusicClient extends SapphireClient {
             leaveOnStop: false,
             leaveOnEmpty: false,
             searchSongs: 10,
+            youtubeDL: false,
             plugins: [new SpotifyPlugin()],
         });
         container.distube = this.distube;
@@ -80,9 +81,8 @@ export default class AliMusicClient extends SapphireClient {
 
         this.distube.on("searchNoResult", (message, query) => { message.channel.send(`No result found for ${query}!`) });
         this.distube.on("searchResult", (message, results) => {
-            message.channel.send(`**Choose an option from below**\n${
-                results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")
-            }\n*Enter anything else or wait 60 seconds to cancel*`);
+            message.channel.send(`**Choose an option from below**\n${results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")
+                }\n*Enter anything else or wait 60 seconds to cancel*`);
         });
         this.distube.on('searchInvalidAnswer', (message, answer, query) => {
             message.channel.send(`Invalid answer: ${answer} for ${query}!`)
