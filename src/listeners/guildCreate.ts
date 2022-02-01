@@ -7,10 +7,10 @@ import GuildModel from '#models/Guild';
 @ApplyOptions<ListenerOptions>({ event: Events.GuildCreate })
 export default class extends Listener {
     public async run(guild: Guild) {
-        const guildModel = await GuildModel.findOne({ id: guild.id });
+        const guildModel = await GuildModel.findOne({ guildID: guild.id });
         if (!guildModel) {
             const newGuild = new GuildModel({
-                id: guild.id,
+                guildID: guild.id,
             });
             await newGuild.save();
             return await guild.leave();
