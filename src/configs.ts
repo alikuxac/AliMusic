@@ -1,10 +1,11 @@
 import type { ClientOptions, Message } from 'discord.js';
-import GuildModels from '#models/Guild';
 
-export const TOKEN = <string>process.env.TOKEN;
+import UserModels from '#models/User';
+
+export const TOKEN = process.env.TOKEN;
 export const OWNERS: string[] = process.env['OWNERS']?.split(',') ?? [];
-export const PREFIX = <string>process.env.PREFIX;
-export const MONGO = <string>process.env.MONGO;
+export const PREFIX = process.env.PREFIX;
+export const MONGO = process.env.MONGO;
 
 export const CLIENT_OPTIONS: ClientOptions = {
     defaultPrefix: PREFIX,
