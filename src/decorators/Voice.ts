@@ -22,7 +22,7 @@ export function RequiredUserInVoice(): MethodDecorator {
 
 export function RequiredBotInVoice(): MethodDecorator {
     return createFunctionPrecondition(
-        (message: GuildMessage) => message.guild.me?.voice.channel !== null,
+        (message: GuildMessage) =>  getAudio(message.guild).voiceChannel?.id !== null,
         (message: GuildMessage) => {
             message.channel.send('I have to be in a voice channel to use this command!');
         }
