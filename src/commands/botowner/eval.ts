@@ -4,6 +4,7 @@ import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import { inspect } from 'util';
 
+import EvalModel from '#models/Eval';
 @ApplyOptions<CommandOptions>({
     name: 'eval',
     description: 'Evaluate code',
@@ -36,12 +37,16 @@ export class EvalCMD extends Command {
                         embeds: [evalcode]
                     })
                 } else {
-                    msg.edit(`Output too long, sending as file`);
-                    
+                    const newEval = new EvalModel({
+                        guildID: message.guild ? message.guild?.id : 'DM',
+                        code: result,
+                    })
+                    await newEval.save();
+                    await msg.edit({
+                        content: `Output too long, saved to database`,
+                        allowedMentions: { repliedUser: false }
+                    })
                 }
-
-
-
             } catch (error) {
                 msg.edit(`Error: \`\`\`js\n${error}\`\`\``);
             }
