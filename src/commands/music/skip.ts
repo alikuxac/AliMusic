@@ -13,6 +13,7 @@ import { getAudio } from '#utils/voice';
 @ApplyOptions<CommandOptions>({
     name: 'skip',
     description: 'Skip current track',
+    requiredClientPermissions: ['SEND_MESSAGES'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class SkipCMD extends Command {

@@ -14,6 +14,7 @@ import { getAudio } from '#utils/voice';
     name: 'nowplaying',
     aliases: ['np'],
     description: 'Check current track',
+    requiredClientPermissions: ['EMBED_LINKS'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class NPCmd extends Command {
