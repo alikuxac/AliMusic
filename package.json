@@ -16,7 +16,9 @@
     "clean": "rimraf ./dist",
     "build": "tsc -b src",
     "compile": "npm run clean && npm run build",
-    "start": "node dist/index.js"
+    "start": "npm run compile && node dist/index.js",
+    "pm2": "pm2 start npm --name AliMusic -- start --watch",
+    "pm2:npx": "npx pm2 start npm --name AliMusic -- start --watch"
   },
   "repository": {
     "type": "git",
