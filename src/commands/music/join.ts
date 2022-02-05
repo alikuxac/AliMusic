@@ -12,7 +12,8 @@ import { getAudio } from '#utils/voice';
     aliases: ['j'],
     description: "Join the voice channel",
     requiredClientPermissions: ['EMBED_LINKS', "CONNECT", "SPEAK"],
-    runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
+    runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD'],
+    enabled: false
 })
 export class JoinCMD extends Command {
     
