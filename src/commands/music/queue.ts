@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators'
 import { Command, CommandOptions, Args } from '@sapphire/framework';
-import { Message, MessageEmbed } from 'discord.js';
-
+import { Message, MessageEmbed, MessageActionRow, MessageButton } from 'discord.js';
+import _ from 'lodash';
 import {
     RequiredUserInVoice,
     RequireSameVoiceChannel,
@@ -37,22 +37,100 @@ export class QueueCMD extends Command {
         if (queue.playing) QueueEmbed.addField('Current', `**[${tracks[0].name}](${tracks[0].url})**`);
 
         const multiple = 10;
-        const end = page * multiple;
-        const start = end - multiple;
+        let start = 0;  
 
-        const arr = tracks.slice(start, end);
-        if (!tracks.length) {
-            QueueEmbed.setDescription(`No song in ${page > 1 ? `page ${page}` : 'the queue'}`);
-        }
-        else {
-            QueueEmbed.setDescription(arr
+        if (tracks.length < 11) {
+            if (!tracks.length) {
+                QueueEmbed.setDescription(`No song in ${page > 1 ? `page ${page}` : 'the queue'}`);
+            } else {
+                QueueEmbed.setDescription(tracks
                 .map((track, i) => `${start + ++i} - [${track.name}](${track.url})`)
                 .join('\n'));
+            }
+            
+            return message.channel.send({ embeds: [QueueEmbed] });
         }
-        const maxPages = Math.ceil(tracks.length / multiple);
 
-        QueueEmbed.setFooter({ text: `Page ${page > maxPages ? maxPages : page} of ${maxPages}` });
+        const chunkArray = _.chunk(tracks, multiple);
+        let currentPage = 0;
+        let pageChunkArray = chunkArray[currentPage];
+
+        QueueEmbed.setDescription(pageChunkArray
+            .map((track, i) => `${start + ++i} - [${track.name}](${track.url})`)
+            .join('\n'));
+
+        QueueEmbed.setFooter({ text: `Page ${currentPage} of ${chunkArray.length}` });
         QueueEmbed.setColor('RANDOM');
-        return message.channel.send({ embeds: [QueueEmbed] });
+
+        const firstButton = new MessageButton().setCustomId('first-queue').setStyle('PRIMARY').setLabel('⏪');
+        const lastButton = new MessageButton().setCustomId('last-queue').setStyle('PRIMARY').setLabel('⏩');
+        const previousButton = new MessageButton().setCustomId('previous-queue').setStyle('PRIMARY').setLabel('◀');
+        const nextButton = new MessageButton().setCustomId('next-queue').setStyle('PRIMARY').setLabel('▶');
+
+        const actionRow = new MessageActionRow()
+            .setComponents(firstButton, previousButton, nextButton, lastButton);
+
+        const QueueMessage = await message.channel.send({ embeds: [QueueEmbed], components: [actionRow] });
+        const collector = QueueMessage.createMessageComponentCollector({
+            filter: (i) => {
+                return i.user.id === message.author.id && ['first-queue', 'last-queue', 'previous-queue', 'next-queue'].includes(i.customId);
+            },
+            time: 60000,
+            componentType: 'BUTTON'
+        });
+    
+        collector.on('collect', async (i) => {
+            switch (i.customId) {
+                case 'first-queue':
+                    currentPage = 0;
+                    start = 0;
+                    pageChunkArray = chunkArray[currentPage];
+                    QueueEmbed.setDescription(pageChunkArray
+                        .map((track, i) => `${start + ++i} - [${track.name}](${track.url})`)
+                        .join('\n'));
+                    QueueEmbed.setFooter({ text: `Page ${currentPage} of ${chunkArray.length}` });
+                    await i.update({ embeds: [QueueEmbed], components: [actionRow] });
+                    break;
+                case 'last-queue':
+                    currentPage = chunkArray.length - 1;
+                    start = currentPage * multiple;
+                    pageChunkArray = chunkArray[currentPage];
+                    QueueEmbed.setDescription(pageChunkArray
+                        .map((track, i) => `${start + ++i} - [${track.name}](${track.url})`)
+                        .join('\n'));
+                    QueueEmbed.setFooter({ text: `Page ${currentPage} of ${chunkArray.length}` });
+                    await i.update({ embeds: [QueueEmbed], components: [actionRow] });
+                    break;
+                case 'previous-queue':
+                    currentPage--;
+                    if (currentPage < 0) currentPage = 0;
+                    start = currentPage * multiple;
+                    pageChunkArray = chunkArray[currentPage];
+                    QueueEmbed.setDescription(pageChunkArray
+                        .map((track, i) => `${start + ++i} - [${track.name}](${track.url})`)
+                        .join('\n'));
+                    QueueEmbed.setFooter({ text: `Page ${currentPage} of ${chunkArray.length}` });
+                    await i.update({ embeds: [QueueEmbed], components: [actionRow] });
+                    break;
+                case 'next-queue':
+                    currentPage++;
+                    if (currentPage > chunkArray.length - 1) currentPage = chunkArray.length - 1;
+                    start = currentPage * multiple;
+                    pageChunkArray = chunkArray[currentPage];
+                    QueueEmbed.setDescription(pageChunkArray
+                        .map((track, i) => `${start + ++i} - [${track.name}](${track.url})`)
+                        .join('\n'));
+                    QueueEmbed.setFooter({ text: `Page ${currentPage} of ${chunkArray.length}` });
+                    await i.update({ embeds: [QueueEmbed], components: [actionRow] });
+                    break;
+            }
+        })
+
+        collector.on('end', async () => {
+            for (const component of actionRow.components) {
+                component.setDisabled(true);
+            }
+            await QueueMessage.edit({ embeds: [QueueEmbed], components: [actionRow] });
+        })
     }
 }
