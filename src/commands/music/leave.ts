@@ -13,7 +13,7 @@ import { getAudio } from '#utils/voice';
     name: "leave",
     aliases: ['left'],
     description: "Leave the voice channel",
-    requiredClientPermissions: ['EMBED_LINKS', "CONNECT", "SPEAK"],
+    requiredClientPermissions: ['EMBED_LINKS'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class LeaveCMD extends Command {
@@ -23,11 +23,11 @@ export class LeaveCMD extends Command {
     @RequireSameVoiceChannel()
     public async messageRun(message: Message) {
         const queue = getAudio(message.guild!);
-        if (!queue) {
+        if (!queue.voiceChannel) {
             return message.channel.send('I am not in a voice channel');
         }
         await queue.stop();
-        await message.guild!.me!.voice.setChannel(null);
+        queue.voice.leave();
         // send success message
         return message.channel.send('Left successfully');
     }
