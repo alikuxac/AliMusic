@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Command, CommandOptions } from '@sapphire/framework';
+import { Command, CommandOptions, CommandContext, Args } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { exec } from 'child_process';
 
@@ -9,18 +9,16 @@ import { exec } from 'child_process';
     preconditions: ['OwnerOnly']
 })
 export class CheckUpdateCMD extends Command {
-    public messageRun(message: Message) {
-        exec('git pull origin master', (error, stdout) => {
+    public async messageRun(message: Message, _args: Args, context: CommandContext) {
+        exec('git pull origin master', async (error, stdout) => {
             const response = (error || stdout);
             if (!error) {
                 if ((response as string).includes('Already up to date.')) {
-                    message.reply('Bot already up to date. No changes since last pull');
+                    await message.reply('Bot already up to date. No changes since last pull');
                 }
                 else {
-                    message.reply('Pulled from GitHub. Restarting bot. \n\nLogs: \n```' + response + '```');
-                    setTimeout(() => {
-                        process.exit();
-                    }, 1000);
+                    await message.reply('Pulled from GitHub. Restarting bot. \n\nLogs: \n```' + response + '```');
+                    return message.channel.send(`Run \`${context.prefix}eval (npx) pm2 stop AliMusic\` if you are using pm2 or \`${context.prefix}eval process.exit(1)\`.`)
                 }
             }
         });
