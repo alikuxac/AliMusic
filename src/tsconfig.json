@@ -6,6 +6,7 @@
 		"rootDir": ".",
 		"baseUrl": ".",
 		"paths": {
+			"#constants/*": ["constants/*"],
 			"#decorators/*": ["decorators/*"],
 			"#lib/*": ["lib/*"],
 			"#lib/structures/*": ["lib/structures/*"],

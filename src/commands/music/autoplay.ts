@@ -2,13 +2,14 @@ import { ApplyOptions } from '@sapphire/decorators'
 import { Command, CommandOptions } from '@sapphire/framework';
 import { Message, MessageEmbed } from 'discord.js';
 
-import { 
+import {
     RequiredUserInVoice,
     RequireSameVoiceChannel,
     RequiredBotInVoice,
     PlayerExists
 } from '#decorators/Voice';
-import { getAudio } from '#utils/voice'; 
+import { getAudio } from '#utils/voice';
+import { EMBED_COLOR_RED, EMBED_COLOR_GREEN } from '#constants/Color';
 @ApplyOptions<CommandOptions>({
     name: "autoplay",
     aliases: ['ap'],
@@ -30,7 +31,8 @@ export class AutoPlayCMD extends Command {
             embeds: [new MessageEmbed()
                 .setTitle(`Success | ${autoplay ? 'Enabled' : 'Disabled'} Autoplay`)
                 .setDescription(`To ${autoplay ? 'disable' : 'enable'} it, run this command again`)
-                .setColor('RANDOM')],
+                .setColor(`${autoplay ? EMBED_COLOR_GREEN : EMBED_COLOR_RED}`)
+            ],
         });
     }
 }

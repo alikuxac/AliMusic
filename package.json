@@ -10,7 +10,8 @@
     "#root/*": "./dist/*.js",
     "#models/*": "./dist/models/*.js",
     "#utils/*": "./dist/utils/*.js",
-    "#decorators/*": "./dist/decorators/*.js"
+    "#decorators/*": "./dist/decorators/*.js",
+    "#constants/*": "./dist/constants/*.js"
   },
   "scripts": {
     "clean": "rimraf ./dist",
