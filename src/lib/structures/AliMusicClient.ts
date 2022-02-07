@@ -3,10 +3,7 @@ import { container } from '@sapphire/pieces'
 import { Enumerable } from '@sapphire/decorators';
 import { DisTube } from 'distube';
 import { SpotifyPlugin } from '@distube/spotify';
-// import {
-//     TextChannel,
-//     MessageEmbed
-// } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 
 import { CLIENT_OPTIONS, TOKEN } from '#root/configs';
 
@@ -39,11 +36,14 @@ export default class AliMusicClient extends SapphireClient {
         })
 
         this.distube.on("addSong", (queue, song) => {
-            queue.textChannel?.send(
-                `Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user}.`
-            )
+            queue.textChannel?.send({
+                embeds: [new MessageEmbed()
+                    .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user?.tag}.`)
+                    .setColor('GREEN')
+                ]
+            })
         });
-
+    
         this.distube.on('deleteQueue', (queue) => {
             queue.textChannel?.send(`Deleted queue!`)
         })
@@ -71,7 +71,7 @@ export default class AliMusicClient extends SapphireClient {
 
         this.distube.on("playSong", (queue, song) => {
             queue.textChannel?.send(
-                `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user}`
+                `Playing \`${song.name}\` - \`${song.formattedDuration}\`\nRequested by: ${song.user?.tag}`
             )
         });
 
@@ -79,10 +79,16 @@ export default class AliMusicClient extends SapphireClient {
             message.channel.send(`Searching canceled`)
         });
 
-        this.distube.on("searchNoResult", (message, query) => { message.channel.send(`No result found for ${query}!`) });
+        this.distube.on("searchNoResult", (message, query) => {
+            message.channel.send(`No result found for ${query}!`)
+        });
         this.distube.on("searchResult", (message, results) => {
-            message.channel.send(`**Choose an option from below**\n${results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")
-                }\n*Enter anything else or wait 60 seconds to cancel*`);
+            const searchResultEmbed = new MessageEmbed()
+                .setTitle(`Search results for ${results}`)
+                .setDescription(`**Choose an option from below**\n${results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")
+                    }\n*Enter anything else or wait 60 seconds to cancel*`)
+                .setColor('RANDOM')
+            message.channel.send({ embeds: [searchResultEmbed] });
         });
         this.distube.on('searchInvalidAnswer', (message, answer, query) => {
             message.channel.send(`Invalid answer: ${answer} for ${query}!`)
@@ -92,21 +98,6 @@ export default class AliMusicClient extends SapphireClient {
         })
     }
 
-    public delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    public msToHHMMSS(duration: number): string {
-        let seconds: string | number = ((duration / 1000) % 60).toFixed(0),
-            minutes: string | number = ((duration / (1000 * 60)) % 60).toFixed(0),
-            hours: string | number = ((duration / (1000 * 60 * 60)) % 24).toFixed(0);
-
-        hours = +hours < 10 ? '0' + hours : hours;
-        minutes = +minutes < 10 ? '0' + minutes : minutes;
-        seconds = +seconds < 10 ? '0' + seconds : seconds;
-
-        return hours + ':' + minutes + ':' + seconds;
-    }
 }
 
 declare module '@sapphire/pieces' {
