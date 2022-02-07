@@ -16,6 +16,7 @@ export const CLIENT_OPTIONS: ClientOptions = {
         let prefix = [PREFIX];
         const user = await UserModels.findOne({ userID: message.author.id });
         if (user) prefix = prefix.concat(user.prefix);
-        return prefix;
-    }
+        return prefix.map(p => p.toLowerCase());
+    },
+    caseInsensitivePrefixes: true
 };
