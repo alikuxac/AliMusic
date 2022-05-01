@@ -54,7 +54,7 @@
     "nanoid": "^3.2.0"
   },
   "devDependencies": {
-    "@types/lodash": "4.14.178",
+    "@types/lodash": "4.14.182",
     "@types/node": "16.11.32",
     "node-abort-controller": "3.0.1",
     "rimraf": "3.0.2",
