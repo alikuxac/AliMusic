@@ -14,12 +14,11 @@ export interface IPlaylist extends Document {
 const playlistSchema = new Schema({
     id: { type: String, unique: true, default: () => nanoid() },
     userID: { type: String, required: true },
-    name: { type: String, required: true },
-    songs: { type: Array, default: [] },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    name: { type: String, required: true, unique: true },
+    songs: { type: Array<Song>, default: [] },
 }, {
-    versionKey: false
+    versionKey: false,
+    timestamps: true
 });
 
 export default model<IPlaylist>('Playlist', playlistSchema);

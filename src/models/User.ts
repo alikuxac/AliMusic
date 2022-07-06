@@ -12,7 +12,6 @@ export interface IUser extends Document {
 const userSchema = new Schema({
     userID: { type: String, required: true, unique: true },
     prefix: { type: Array, required: true, default: [PREFIX] },
-    whitelist: { type: Boolean, required: true, default: false },
     blacklist: { type: Boolean, required: true, default: false },
     playlist_limit: { type: Number, required: true, default: 5 },
 }, {
