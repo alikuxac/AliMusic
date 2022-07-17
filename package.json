@@ -37,7 +37,7 @@
   "homepage": "https://github.com/alikuxac/AliMusic#readme",
   "dependencies": {
     "@discordjs/opus": "^0.8.0",
-    "@discordjs/voice": "^0.10.0",
+    "@discordjs/voice": "^0.11.0",
     "@distube/soundcloud": "^1.1.0",
     "@distube/spotify": "^1.1.0",
     "@sapphire/decorators": "^4.0.2",
