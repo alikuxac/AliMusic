@@ -4,7 +4,7 @@ import { Enumerable } from '@sapphire/decorators';
 import { DisTube } from 'distube';
 import { SpotifyPlugin } from '@distube/spotify';
 import { SoundCloudPlugin } from '@distube/soundcloud';
-import { MessageEmbed } from 'discord.js';
+import { YtDlpPlugin } from '@distube/yt-dlp';
 
 import { CLIENT_OPTIONS, TOKEN } from '#root/configs';
 
@@ -19,8 +19,7 @@ export default class AliMusicClient extends SapphireClient {
             leaveOnStop: false,
             leaveOnEmpty: false,
             searchSongs: 10,
-            youtubeDL: false,
-            plugins: [new SpotifyPlugin(), new SoundCloudPlugin()],
+            plugins: [new SpotifyPlugin(), new SoundCloudPlugin(), new YtDlpPlugin()],
         });
         container.distube = this.distube;
         this.loadDistubeEvent();
