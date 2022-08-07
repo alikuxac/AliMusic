@@ -5,7 +5,7 @@ import type { Message } from 'discord.js';
 @ApplyOptions<CommandOptions>({
     name: "reload",
     description: "Reloads a command",
-    requiredClientPermissions: ['SEND_MESSAGES'],
+    requiredClientPermissions: ['SendMessages'],
     preconditions: ["OwnerOnly"],
 })
 export class ReloadCMD extends Command {

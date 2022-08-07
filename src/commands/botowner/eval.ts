@@ -1,14 +1,14 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command, CommandOptions, Args, SapphireClient } from '@sapphire/framework';
 import type { Message } from 'discord.js';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { inspect } from 'util';
 
 import EvalModel from '#models/Eval';
 @ApplyOptions<CommandOptions>({
     name: 'eval',
     description: 'Evaluate code',
-    requiredClientPermissions: ['EMBED_LINKS'],
+    requiredClientPermissions: ['EmbedLinks'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD'],
     preconditions: ['OwnerOnly'],
 })
@@ -27,10 +27,10 @@ export class EvalCMD extends Command {
                     result = inspect(result, { depth: 0 });
                 }
                 if (result.length < 4000) {
-                    let evalcode = new MessageEmbed()
+                    let evalcode = new EmbedBuilder()
                         .setAuthor({ name: `Eval by ${message.author.tag}`, iconURL: `https://cdn.discordapp.com/emojis/314405560701419520.png` })
                         .setDescription(`**:inbox_tray: Input:**\n\n\`\`\`js\n${code}\`\`\``)
-                        .addField(`\u200b`, `**:outbox_tray: Output:**\n\n\`\`\`js\n${clean(result, this.container.client)}\`\`\``, true)
+                        .addFields([{ name: `\u200b`, value: `**:outbox_tray: Output:**\n\n\`\`\`js\n${clean(result, this.container.client)}\`\`\``, inline: true }])
                         .setColor(0x00FF00)
                         .setFooter({ text: `Node.js - Time taken: ${Date.now() - message.createdTimestamp} ms` });
                     msg.edit({

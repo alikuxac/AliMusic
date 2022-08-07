@@ -13,7 +13,7 @@ import { getAudio } from '#utils/voice';
 @ApplyOptions<CommandOptions>({
     name: 'pause',
     description: 'Pause current track',
-    requiredClientPermissions: ['SEND_MESSAGES'],
+    requiredClientPermissions: ['SendMessages', 'SendMessagesInThreads'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class PauseCMD extends Command {

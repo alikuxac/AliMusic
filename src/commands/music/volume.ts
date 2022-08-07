@@ -1,7 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators'
 import { Command, CommandOptions } from '@sapphire/framework';
-import { Message, MessageEmbed } from 'discord.js';
-import { MessageButton, MessageActionRow } from 'discord.js';
+import { Message, EmbedBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle, ComponentType } from 'discord.js';
 
 import {
     RequiredUserInVoice,
@@ -14,7 +13,7 @@ import { getAudio } from '#utils/voice';
 @ApplyOptions<CommandOptions>({
     name: "volume",
     description: "Change volume of current player",
-    requiredClientPermissions: ['EMBED_LINKS'],
+    requiredClientPermissions: ['EmbedLinks'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class VolumeCMD extends Command {
@@ -26,13 +25,13 @@ export class VolumeCMD extends Command {
     public async messageRun(message: Message) {
         const queue = getAudio(message.guild!);
 
-        const minusTenButton = new MessageButton().setCustomId('minus-ten').setStyle('PRIMARY').setLabel('-10');
-        const minusOneButton = new MessageButton().setCustomId('minus-one').setStyle('PRIMARY').setLabel('-1');
-        const plusOneButton = new MessageButton().setCustomId('plus-one').setStyle('PRIMARY').setLabel('+1');
-        const plusTenButton = new MessageButton().setCustomId('plus-ten').setStyle('PRIMARY').setLabel('+10');
-        const stopButton = new MessageButton().setCustomId('stop-volume').setStyle('DANGER').setLabel('⏹')
+        const minusTenButton = new ButtonBuilder().setCustomId('minus-ten').setStyle(ButtonStyle.Primary).setLabel('-10');
+        const minusOneButton = new ButtonBuilder().setCustomId('minus-one').setStyle(ButtonStyle.Primary).setLabel('-1');
+        const plusOneButton = new ButtonBuilder().setCustomId('plus-one').setStyle(ButtonStyle.Primary).setLabel('+1');
+        const plusTenButton = new ButtonBuilder().setCustomId('plus-ten').setStyle(ButtonStyle.Primary).setLabel('+10');
+        const stopButton = new ButtonBuilder().setCustomId('stop-volume').setStyle(ButtonStyle.Danger).setLabel('⏹')
 
-        const actionRow = new MessageActionRow().addComponents(
+        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
             minusTenButton,
             minusOneButton,
             stopButton,
@@ -40,19 +39,19 @@ export class VolumeCMD extends Command {
             plusTenButton
         );
 
-        const actionEmbed = new MessageEmbed()
+        const actionEmbed = new EmbedBuilder()
             .setTitle('Volume')
             .setDescription(`The player volume is \`${queue.volume}\`%.`)
-            .setColor('RANDOM')
+            .setColor('Random')
             .setFooter({ text: 'Click on the buttons to change the volume.' })
 
         const actionMessage = await message.channel.send({ embeds: [actionEmbed], components: [actionRow] });
         const collector = actionMessage.createMessageComponentCollector({
             filter: (i) => {
-                return i.user.id === message.author.id && [ 'minus-ten', 'minus-one', 'stop-volume', 'plus-one', 'plus-ten'].includes(i.customId)
+                return i.user.id === message.author.id && ['minus-ten', 'minus-one', 'stop-volume', 'plus-one', 'plus-ten'].includes(i.customId)
             },
             time: 60000,
-            componentType: 'BUTTON'
+            componentType: ComponentType.Button
         })
 
         collector.on('collect', async (i) => {
@@ -61,7 +60,7 @@ export class VolumeCMD extends Command {
                     const newMinusTenVolume = queue.volume - 10;
                     newMinusTenVolume < 0 ? queue.setVolume(0) : queue.setVolume(newMinusTenVolume);
                     collector.resetTimer();
-                    await i.update({ embeds: [actionEmbed], components: [actionRow] });
+                    await i.update({  embeds: [actionEmbed], components: [actionRow] });
                     break;
                 case 'minus-one':
                     const newMinusOneVolume = queue.volume - 1;

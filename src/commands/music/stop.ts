@@ -13,7 +13,7 @@ import { getAudio } from '#utils/voice';
 @ApplyOptions<CommandOptions>({
     name: "stop",
     description: "Stop current player",
-    requiredClientPermissions: ['SEND_MESSAGES'],
+    requiredClientPermissions: ['SendMessages'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class StopCMD extends Command {

@@ -9,7 +9,7 @@ import { PREFIX } from '#root/configs'
 @ApplyOptions<CommandOptions>({
     name: 'prefix',
     description: 'Change the prefix of the bot',
-    requiredClientPermissions: ['EMBED_LINKS', 'SEND_MESSAGES'],
+    requiredClientPermissions: ['EmbedLinks', 'SendMessages'],
 })
 export class PrefixCMD extends Command {
     public async messageRun(message: Message, args: Args) {

@@ -1,10 +1,11 @@
 import { SapphireClient } from '@sapphire/framework';
 import { container } from '@sapphire/pieces'
 import { Enumerable } from '@sapphire/decorators';
-import { DisTube } from 'distube';
+import { DisTube, SearchResultType } from 'distube';
 import { SpotifyPlugin } from '@distube/spotify';
 import { SoundCloudPlugin } from '@distube/soundcloud';
 import { YtDlpPlugin } from '@distube/yt-dlp';
+import { EmbedBuilder } from 'discord.js';
 
 import { CLIENT_OPTIONS, TOKEN } from '#root/configs';
 
@@ -37,9 +38,9 @@ export default class AliMusicClient extends SapphireClient {
 
         this.distube.on("addSong", (queue, song) => {
             queue.textChannel?.send({
-                embeds: [new MessageEmbed()
+                embeds: [new EmbedBuilder()
                     .setDescription(`Added ${song.name} - \`${song.formattedDuration}\` to the queue by ${song.user?.tag}.`)
-                    .setColor('GREEN')
+                    .setColor('Green')
                 ]
             })
         });
@@ -49,11 +50,12 @@ export default class AliMusicClient extends SapphireClient {
         })
 
         this.distube.on('disconnect', (queue) => {
+            queue.pause();
             queue.textChannel?.send(`Disconnected from the queue!`)
         });
 
         this.distube.on('error', (channel, error) => {
-            channel.send(`Error while playing: ${error}`)
+            channel ? channel.send(`Error while playing: ${error}`) : console.error(error);
         })
 
         this.distube.on('finish', queue => {
@@ -63,6 +65,7 @@ export default class AliMusicClient extends SapphireClient {
         this.distube.on('initQueue', (queue) => {
             queue.autoplay = false;
             queue.volume = 100;
+            queue.repeatMode = 0;
         })
 
         this.distube.on("noRelated", queue => {
@@ -83,16 +86,18 @@ export default class AliMusicClient extends SapphireClient {
             message.channel.send(`No result found for ${query}!`)
         });
         this.distube.on("searchResult", (message, results) => {
-            const searchResultEmbed = new MessageEmbed()
+            const searchResultEmbed = new EmbedBuilder()
                 .setTitle(`Search results for ${results}`)
-                .setDescription(`**Choose an option from below**\n${results.map((song, i) => `**${i + 1}**. ${song.name} - \`${song.formattedDuration}\``).join("\n")
+                .setDescription(`**Choose an option from below**\n${results.map((song, i) => `**${i + 1}**. ${song.name}${song.type === SearchResultType.VIDEO ? ` -\`${song.formattedDuration}\`` : ''}`).join("\n")
                     }\n*Enter anything else or wait 60 seconds to cancel*`)
-                .setColor('RANDOM')
+                .setColor('Random')
             message.channel.send({ embeds: [searchResultEmbed] });
         });
+
         this.distube.on('searchInvalidAnswer', (message, answer, query) => {
             message.channel.send(`Invalid answer: ${answer} for ${query}!`)
         });
+
         this.distube.on('searchDone', (message, query) => {
             message.channel.send(`Search for ${query} done!`)
         })

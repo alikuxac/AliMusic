@@ -13,7 +13,7 @@ import { getAudio } from '#utils/voice';
     name: "leave",
     aliases: ['left'],
     description: "Leave the voice channel",
-    requiredClientPermissions: ['EMBED_LINKS'],
+    requiredClientPermissions: ['EmbedLinks'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class LeaveCMD extends Command {

@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators'
 import { Command, CommandOptions } from '@sapphire/framework';
-import { Message, MessageEmbed } from 'discord.js';
+import { Message, EmbedBuilder } from 'discord.js';
 
 import {
     RequiredUserInVoice,
@@ -14,7 +14,7 @@ import { EMBED_COLOR_RED, EMBED_COLOR_GREEN } from '#constants/Color';
     name: "autoplay",
     aliases: ['ap'],
     description: "Toggle autoplay",
-    requiredClientPermissions: ['EMBED_LINKS'],
+    requiredClientPermissions: ['EmbedLinks'],
     runIn: ['GUILD_TEXT', 'GUILD_PUBLIC_THREAD']
 })
 export class AutoPlayCMD extends Command {
@@ -28,7 +28,7 @@ export class AutoPlayCMD extends Command {
         const queue = getAudio(message.guild!);
         const autoplay = queue.toggleAutoplay()
         return message.channel.send({
-            embeds: [new MessageEmbed()
+            embeds: [new EmbedBuilder()
                 .setTitle(`Success | ${autoplay ? 'Enabled' : 'Disabled'} Autoplay`)
                 .setDescription(`To ${autoplay ? 'disable' : 'enable'} it, run this command again`)
                 .setColor(`${autoplay ? EMBED_COLOR_GREEN : EMBED_COLOR_RED}`)
