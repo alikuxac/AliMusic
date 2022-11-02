@@ -46,7 +46,7 @@
     "@sapphire/discord.js-utilities": "^5.0.0",
     "@sapphire/framework": "^3.0.0",
     "@sapphire/pieces": "^3.4.1",
-    "axios": "^0.27.2",
+    "axios": "^1.0.0",
     "colorette": "^2.0.19",
     "discord.js": "^14.1.2",
     "distube": "^4.0.3",
