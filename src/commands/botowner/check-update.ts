@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Command, CommandOptions, CommandContext, Args } from '@sapphire/framework';
+import { Command, CommandOptions, MessageCommandContext, Args } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { exec } from 'child_process';
 
@@ -9,7 +9,7 @@ import { exec } from 'child_process';
     preconditions: ['OwnerOnly']
 })
 export class CheckUpdateCMD extends Command {
-    public async messageRun(message: Message, _args: Args, context: CommandContext) {
+    public async messageRun(message: Message, _args: Args, context: MessageCommandContext) {
         exec('git pull origin master', async (error, stdout) => {
             const response = (error || stdout);
             if (!error) {

@@ -1,17 +1,17 @@
 import type { ClientOptions, Message } from 'discord.js';
-
+import { Partials } from 'discord.js';
 import UserModels from '#models/User';
 
-export const TOKEN = process.env.TOKEN;
+export const TOKEN = process.env.TOKEN as string;
 export const OWNERS: string[] = process.env['OWNERS']?.split(',') ?? [];
-export const PREFIX = process.env.PREFIX;
-export const MONGO = process.env.MONGO;
+export const PREFIX = process.env.PREFIX as string;
+export const MONGO = process.env.MONGO as string;
 
 export const CLIENT_OPTIONS: ClientOptions = {
     defaultPrefix: PREFIX,
     regexPrefix: /^(hey\s+)?ali music[,! ]/i,
-    intents: ['GUILD_MESSAGES', 'GUILD_MEMBERS', 'GUILD_VOICE_STATES', 'GUILDS', 'GUILD_MESSAGE_TYPING'],
-    partials: ['GUILD_MEMBER', 'CHANNEL', 'MESSAGE', 'USER', 'REACTION'],
+    intents: ['GuildMessages', 'GuildMembers', 'GuildVoiceStates', 'Guilds', 'GuildMessageTyping'],
+    partials: [Partials.Channel, Partials.GuildMember, Partials.Message, Partials.Reaction, Partials.User],
     fetchPrefix: async (message: Message) => {
         let prefix = [PREFIX];
         const user = await UserModels.findOne({ userID: message.author.id });

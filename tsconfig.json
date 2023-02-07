@@ -10,7 +10,6 @@
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"importHelpers": true,
-		"importsNotUsedAsValues": "error",
 		"incremental": true,
 		"lib": ["esnext", "DOM"],
 		"module": "CommonJS",
