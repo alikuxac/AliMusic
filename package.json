@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@types/lodash": "4.14.200",
-    "@types/node": "18.18.8",
+    "@types/node": "20.12.7",
     "node-abort-controller": "3.1.1",
     "rimraf": "5.0.5",
     "typescript": "5.2.2"
